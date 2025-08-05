@@ -41,7 +41,8 @@ export const Home = () => {
                                 <Post
                                     id={obj._id}
                                     title={obj.title}
-                                    imageUrl="https://dev-to-uploads.s3.amazonaws.com/uploads/articles/icohm5g0axh9wjmu4oc3.png"
+                                    imageUrl={obj.imageUrl}
+                                    // imageUrl="https://dev-to-uploads.s3.amazonaws.com/uploads/articles/icohm5g0axh9wjmu4oc3.png"
                                     user={obj.user}
                                     createdAt={obj.createdAt}
                                     viewsCount={obj.viewsCount}
@@ -53,7 +54,7 @@ export const Home = () => {
                     )}
                 </Grid>
                 <Grid xs={4} item>
-                    <TagsBlock items={tags.items} isLoading={false} />
+                    <TagsBlock items={tags.items} isLoading={isTagsLoading} />
                     <CommentsBlock
                         items={[
                             {
