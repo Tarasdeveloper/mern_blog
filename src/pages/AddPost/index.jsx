@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import TextField from '@mui/material/TextField';
 import Paper from '@mui/material/Paper';
 import Button from '@mui/material/Button';
@@ -7,11 +7,12 @@ import SimpleMDE from 'react-simplemde-editor';
 import 'easymde/dist/easymde.min.css';
 import styles from './AddPost.module.scss';
 import { selectIsAuth } from '../../redux/slices/auth';
-import { Navigate, useNavigate } from 'react-router-dom';
+import { Navigate, useNavigate, useParams } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import axios from '../../axios';
 
 export const AddPost = () => {
+    const { id } = useParams();
     const navigate = useNavigate();
     const isAuth = useSelector(selectIsAuth);
     const [value, setValue] = useState('');
@@ -20,6 +21,7 @@ export const AddPost = () => {
     const [tags, setTags] = useState('');
     const [imageUrl, setImageUrl] = useState('');
     const inputFileRef = useRef(null);
+    const isEditing = Boolean(id);
 
     const handleChangeFile = async (evt) => {
         try {
@@ -41,6 +43,23 @@ export const AddPost = () => {
     const onChange = React.useCallback((value) => {
         setValue(value);
     }, []);
+
+    useEffect(() => {
+        if (id) {
+            axios
+                .get(`/posts/${id}`)
+                .then(({ data }) => {
+                    setTitle(data.title);
+                    setValue(data.text);
+                    setImageUrl(data.imageUrl);
+                    setTags(data.tags.join(', '));
+                })
+                .catch((err) => {
+                    console.log(err);
+                    alert('Error changing post');
+                });
+        }
+    }, [id]);
 
     const options = React.useMemo(
         () => ({
@@ -68,13 +87,16 @@ export const AddPost = () => {
             const fields = {
                 title,
                 imageUrl,
-                // tags: tags.split(',').map((tag) => tag.trim()),
-                tags,
+                tags: tags.split(',').map((t) => t.trim()),
                 text: value,
             };
-            const { data } = await axios.post('/posts', fields);
-            const id = data._id;
-            navigate(`/posts/${id}`);
+            const { data } = isEditing
+                ? await axios.patch(`/posts/${id}`, fields)
+                : await axios.post('/posts', fields);
+
+            const _id = isEditing ? id : data._id;
+
+            navigate(`/posts/${_id}`);
         } catch (err) {
             console.log('Error response:', err.response?.data);
             alert('Upload error');
@@ -140,7 +162,7 @@ export const AddPost = () => {
                 />
                 <div className={styles.buttons}>
                     <Button type="submit" size="large" variant="contained">
-                        Опубликовать
+                        {isEditing ? 'Сохранить' : 'Опубликовать'}
                     </Button>
                     <a href="/">
                         <Button size="large">Отмена</Button>

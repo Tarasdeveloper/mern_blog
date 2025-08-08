@@ -9,6 +9,8 @@ import styles from './Post.module.scss';
 import { UserInfo } from '../UserInfo';
 import { PostSkeleton } from './Skeleton';
 import { Link } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import { fetchRemovePost } from '../../redux/slices/posts';
 
 export const Post = ({
     id,
@@ -24,11 +26,17 @@ export const Post = ({
     isLoading,
     isEditable,
 }) => {
+    const dispatch = useDispatch();
+
     if (isLoading) {
         return <PostSkeleton />;
     }
 
-    const onClickRemove = () => {};
+    const onClickRemove = () => {
+        if (window.confirm('Are you sure you want to delete the post?')) {
+            dispatch(fetchRemovePost(id));
+        }
+    };
 
     return (
         <div className={clsx(styles.root, { [styles.rootFull]: isFullPost })}>
@@ -45,13 +53,15 @@ export const Post = ({
                 </div>
             )}
             {imageUrl && (
-                <img
-                    className={clsx(styles.image, {
-                        [styles.imageFull]: isFullPost,
-                    })}
-                    src={imageUrl}
-                    alt={title}
-                />
+                <div className={styles.imageWrap}>
+                    <img
+                        className={clsx(styles.image, {
+                            [styles.imageFull]: isFullPost,
+                        })}
+                        src={imageUrl}
+                        alt={title}
+                    />
+                </div>
             )}
             <div className={styles.wrapper}>
                 <UserInfo {...user} additionalText={createdAt} />

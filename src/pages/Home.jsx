@@ -39,15 +39,14 @@ export const Home = () => {
                                 <Post isLoading={true} key={index} />
                             ) : (
                                 <Post
+                                    key={obj._id}
                                     id={obj._id}
                                     title={obj.title}
-                                    // imageUrl={obj.imageUrl}
                                     imageUrl={
                                         obj.imageUrl
                                             ? `http://localhost:4444${obj.imageUrl}`
-                                            : ''
+                                            : 'https://dev-to-uploads.s3.amazonaws.com/uploads/articles/icohm5g0axh9wjmu4oc3.png'
                                     }
-                                    // imageUrl="https://dev-to-uploads.s3.amazonaws.com/uploads/articles/icohm5g0axh9wjmu4oc3.png"
                                     user={obj.user}
                                     createdAt={obj.createdAt}
                                     viewsCount={obj.viewsCount}
